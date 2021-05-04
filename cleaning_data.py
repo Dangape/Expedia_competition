@@ -32,8 +32,23 @@ data["price_difference_user"] = data["visitor_hist_adr_usd"] - data["price_usd"]
 data["starrating_diff"] = data["visitor_hist_starrating"] - data["prop_starrating"]
 data = data.drop(columns=["visitor_hist_starrating"]) #drop after calculating starrating_diff
 
+#Filling NAs
+data["srch_query_affinity_score"] = data["srch_query_affinity_score"].fillna(min(data["srch_query_affinity_score"]))
+
 for prop in tqdm(unique_prop):
     data.loc[data.prop_id == prop,"prop_review_score"] = data.loc[data.prop_id == prop,"prop_review_score"].fillna(min(data.loc[data.prop_id==prop,"prop_review_score"]))
+    data.loc[data.prop_id == prop, "prop_location_score2"] = data.loc[data.prop_id == prop, "prop_location_score2"].fillna(min(data.loc[data.prop_id == prop, "prop_location_score2"]))
+
+unique_srch_dest = data.srch_destination_id.unique()
+unique_visitor_loc = data.visitor_location_country_id.unique()
+
+for destination in tqdm(unique_srch_dest):
+    for visitor in unique_visitor_loc:
+        data.loc[(data.srch_destination_id==destination)&(data.visitor_location_country_id==visitor),"orig_destination_distance"] = \
+            data.loc[(data.srch_destination_id==destination)&(data.visitor_location_country_id==visitor),"orig_destination_distance"].\
+                fillna(data.loc[(data.srch_destination_id==destination)&(data.visitor_location_country_id==visitor),"orig_destination_distance"].mean())
+
+data["orig_destination_distance"] = data["orig_destination_distance"].fillna(data["orig_destination_distance"].mean()) #replace remaining NAs with mean
 
 #Saving new data frame
 print("Saving file to disk...")
@@ -44,4 +59,4 @@ print("File saved!")
 print("Loading data...")
 data = pd.read_pickle("feature_engineering.pkl")
 print("Loaded!")
-print(data)
+print(data)+
