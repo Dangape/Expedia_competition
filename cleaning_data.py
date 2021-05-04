@@ -6,7 +6,7 @@ from tqdm import tqdm
 import pickle
 
 #load data
-data = pd.read_csv("Data/training_set_VU_DM.csv")
+data = pd.read_csv("Data/training_set_VU_DM.csv") #training data
 print(data.head())
 print(data.columns)
 
@@ -59,4 +59,4 @@ print("File saved!")
 print("Loading data...")
 data = pd.read_pickle("feature_engineering.pkl")
 print("Loaded!")
-print(data)+
+print(data)
