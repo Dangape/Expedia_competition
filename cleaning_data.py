@@ -74,5 +74,5 @@ for column in data.columns:
 #
 #Saving new data frame
 print("Saving file to disk...")
-data.to_pickle("feature_engineering.pkl") #save dataframe with new features
+data.to_csv("feature_engineering.csv",index=False) #save dataframe with new features
 print("File saved!")
