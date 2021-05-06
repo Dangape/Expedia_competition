@@ -30,16 +30,21 @@ unique_prop = data.prop_id.unique() #unique property IDs
 # #Creating new features
 data = data.drop(columns=["gross_bookings_usd"]) #not an interesting feature
 data["price_difference_history"] = data["prop_log_historical_price"] - np.log(data["price_usd"])
-data["price_difference_user"] = data["visitor_hist_adr_usd"] - data["price_usd"]
-data["starrating_diff"] = data["visitor_hist_starrating"] - data["prop_starrating"]
+data["visitor_hist_adr_usd"] = data["visitor_hist_adr_usd"].fillna(0)
+data["price_difference_user"] = abs(data["visitor_hist_adr_usd"] - data["price_usd"])
+data["visitor_hist_starrating"] = data["visitor_hist_starrating"].fillna(0)
+data["starrating_diff"] = abs(data["visitor_hist_starrating"] - data["prop_starrating"])
 data = data.drop(columns=["visitor_hist_starrating"]) #drop after calculating starrating_diff
 
 #Filling NAs
-data["srch_query_affinity_score"] = data["srch_query_affinity_score"].fillna(min(data["srch_query_affinity_score"]))
+data["srch_query_affinity_score"] = data["srch_query_affinity_score"].fillna(data["srch_query_affinity_score"].min())
 
 for prop in tqdm(unique_prop):
-    data.loc[data.prop_id == prop,"prop_review_score"] = data.loc[data.prop_id == prop,"prop_review_score"].fillna(min(data.loc[data.prop_id==prop,"prop_review_score"]))
-    data.loc[data.prop_id == prop, "prop_location_score2"] = data.loc[data.prop_id == prop, "prop_location_score2"].fillna(min(data.loc[data.prop_id == prop, "prop_location_score2"]))
+    data.loc[data.prop_id == prop,"prop_review_score"] = data.loc[data.prop_id == prop,"prop_review_score"].fillna(data.loc[data.prop_id==prop,"prop_review_score"].min())
+    data.loc[data.prop_id == prop, "prop_location_score2"] = data.loc[data.prop_id == prop, "prop_location_score2"].fillna(data.loc[data.prop_id == prop, "prop_location_score2"].min())
+
+for i in list(data.columns)[26:50]:
+    data[str(i)] = data[str(i)].fillna(0) #replaceing competitors variables
 
 
 # def replace_NaN(x):
@@ -60,7 +65,13 @@ for prop in tqdm(unique_prop):
 # print(data)
 
 data["orig_destination_distance"] = data["orig_destination_distance"].fillna(data["orig_destination_distance"].mean())
+data["prop_review_score"] = data["prop_review_score"].fillna(data["prop_review_score"].mean()) #Replace ramaining NAs
+data["prop_location_score2"] = data["prop_location_score2"].fillna(data["prop_location_score2"].mean()) #replacing remaining 3% NAs
 
+for column in data.columns:
+    percent = (data[str(column)].isna().sum())/(len(data[str(column)]))*100
+    print(str(column),":",float(percent))
+#
 #Saving new data frame
 print("Saving file to disk...")
 data.to_pickle("feature_engineering.pkl") #save dataframe with new features
