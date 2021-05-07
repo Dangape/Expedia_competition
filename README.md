@@ -6,5 +6,5 @@ Furthermore, there is a Dropbox link [here](https://www.dropbox.com/sh/5kedakjiz
 
 # Files
 - The `cleaning_data.py` file contains the main code for cleaning the data and creating new features (feature engineering)
-- Since the code takes too long to run (aprox. 10h), the `feature_engineering.zip` file contains the cleaned data set in  a `.pkl` format
-- In order to open the cleaned file in python use the `pandas` built-in function `pd.read_pickle`
+- Since the code takes too long to run (aprox. 8h), the `feature_engineering.rar` file contains the cleaned data set in  a `.csv` format
+
