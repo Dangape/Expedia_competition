@@ -1,22 +1,36 @@
 import pandas as pd
 import pickle
+import numpy as np
 
 #Loading test data
 print("Reading data...")
 data = pd.read_csv("feature_engineering_test.csv")
-print(data.head(5))
-
-
-# is_NaN = data.isnull()
-# row_has_NaN = is_NaN.any(axis=1)
-# rows_with_NaN = data[row_has_NaN]
-# print(rows_with_NaN)
-
-# #Show missing values percentege for each column
-# for column in data.columns:
-#     percent = (data[str(column)].isna().sum())/(len(data[str(column)]))*100
-#     print(str(column),":",float(percent))
-
+# print(data.head(5))
+# print(data.columns)
+# print(len(data.columns))
+#
+# data = data.drop(columns=["date_time","random_bool"])
+# data.replace([np.inf, -np.inf], int(0), inplace=True)
+#
 # # load the model from disk
+# print("Loading model...")
+# filename = 'finalized_model.sav'
 # loaded_model = pickle.load(open(filename, 'rb'))
-# result = loaded_model.score(X_test, Y_test)
+#
+# #Prediction
+# print("Loaded! Now, predicting...")
+# pred = loaded_model.predict(data)
+# print(pred)
+#
+# #Save prediction
+# print("Saving prediction...")
+# open_file = open("pred.pkl","wb")
+# pickle.dump("pred.pkl",open_file)
+# open_file.close()
+
+#Relevance grades
+#Load prediction
+open_file = open("pred.pkl","rb")
+loaded_pred = pickle.load(open_file)
+open_file.close()
+print(loaded_pred.unique)
