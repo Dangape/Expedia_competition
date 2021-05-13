@@ -6,9 +6,9 @@ from tqdm import tqdm
 import pickle
 
 # #load data
+print("Reading data...")
 data = pd.read_csv("Data/test_set_VU_DM.csv") #training data
 print(data.head())
-print(data.columns)
 
 #Show missing values percentege for each column
 for column in data.columns:
