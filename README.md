@@ -12,7 +12,7 @@ Furthermore, there is a Dropbox link [here](https://www.dropbox.com/sh/5kedakjiz
 - The `generate_submission.py` creates a prediction for the test file and generates the file to submit on Kaggle
 
 
-# Assigning relevance grades
+## Assigning relevance grades
 - 5: the user purchased a room at this hotel
 - 1: the user clicked to see more information about this hotel
 - 0: the user neither clicked nor purchased this hotel
