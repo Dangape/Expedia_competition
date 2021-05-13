@@ -4,21 +4,14 @@ import pickle
 #Loading test data
 print("Reading data...")
 data = pd.read_csv("feature_engineering_test.csv")
-print(data.columns)
-print(data.isnull().values.any())
-
-print(data.columns)
-print(len(data.columns))
+print(data.head(5))
 
 
-is_NaN = data.isnull()
+# is_NaN = data.isnull()
+# row_has_NaN = is_NaN.any(axis=1)
+# rows_with_NaN = data[row_has_NaN]
+# print(rows_with_NaN)
 
-row_has_NaN = is_NaN.any(axis=1)
-
-rows_with_NaN = data[row_has_NaN]
-
-
-print(rows_with_NaN)
 # #Show missing values percentege for each column
 # for column in data.columns:
 #     percent = (data[str(column)].isna().sum())/(len(data[str(column)]))*100
