@@ -16,3 +16,5 @@ Furthermore, there is a Dropbox link [here](https://www.dropbox.com/sh/5kedakjiz
 - 5: the user purchased a room at this hotel
 - 1: the user clicked to see more information about this hotel
 - 0: the user neither clicked nor purchased this hotel
+
+Submissions for each user query should recommend hotels in order from the highest grade (most likely to purchase a hotel room) to the lowest grade (least likely to purchase a hotel room or click on the hotel).
