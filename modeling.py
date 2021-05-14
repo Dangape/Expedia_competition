@@ -10,7 +10,7 @@ from sklearn.ensemble import GradientBoostingClassifier
 import matplotlib.pyplot as plt
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.neighbors import KNeighborsClassifier
+from xgboost import XGBClassifier
 from sklearn.ensemble import VotingClassifier
 from sklearn.linear_model import LogisticRegression
 import pickle
@@ -36,29 +36,35 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.2)
 # X_val, X_test, Y_val, Y_test = train_test_split(X_val_and_test, Y_val_and_test, test_size=0.5)
 
 print("Started running model...")
-#Create Random forest model
-print("Random Forest...")
-forest = RandomForestClassifier(n_estimators=200, random_state=0)
-classifier_rf = MultiOutputClassifier(forest)
-classifier_rf.fit(X_train, Y_train)
-score = classifier_rf.score(X_test,Y_test)
-print(score)
+# #Create Random forest model
+# print("Random Forest...")
+# forest = RandomForestClassifier(n_estimators=200, random_state=0)
+# classifier_rf = MultiOutputClassifier(forest)
+# classifier_rf.fit(X_train, Y_train)
+# score = classifier_rf.score(X_test,Y_test)
+# print(score)
+#
+# print("Saving model to disk...")
+# filename = 'finalized_model_rf.sav'
+# pickle.dump(classifier_rf, open(filename, 'wb'))
+# print("Model saved!")
 
-print("Saving model to disk...")
+# load the model from disk
 filename = 'finalized_model_rf.sav'
-pickle.dump(classifier_rf, open(filename, 'wb'))
-print("Model saved!")
+print("Loading model...")
+loaded_model_rf = pickle.load(open(filename, 'rb'))
+
 #create new a knn model
-print("Knn...")
-knn = KNeighborsClassifier(n_neighbors=10)
-classifier_knn = MultiOutputClassifier(knn)
-classifier_knn.fit(X_train, Y_train)
-score = classifier_knn.score(X_test,Y_test)
+print("XBC...")
+XBC = XGBClassifier()
+classifier_XBC = MultiOutputClassifier(XBC)
+classifier_XBC.fit(X_train, Y_train)
+score = classifier_XBC.score(X_test,Y_test)
 print(score)
 
 print("Saving model to disk...")
-filename = 'finalized_model_knn.sav'
-pickle.dump(classifier_knn, open(filename, 'wb'))
+filename = 'finalized_model_XBC.sav'
+pickle.dump(classifier_XBC, open(filename, 'wb'))
 print("Model saved!")
 #create a new logistic regression model
 print("Logistic regression...")
@@ -81,7 +87,7 @@ print("Model saved!")
 
 #create a dictionary of our models
 print("Ensembling...")
-estimators=[("knn", classifier_knn), ("rf", classifier_rf),("log_reg",classifier_log_reg)]#create our voting classifier, inputting our models
+estimators=[("knn", classifier_XBC), ("rf", loaded_model_rf),("log_reg",classifier_log_reg)]#create our voting classifier, inputting our models
 ensemble = VotingClassifier(estimators, voting="hard")
 classfier_ensembled = MultiOutputClassifier(ensemble)
 classfier_ensembled.fit(X_train, Y_train)#test our model on the test data

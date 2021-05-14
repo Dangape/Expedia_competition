@@ -5,3 +5,4 @@ Data/training_set_VU_DM.csv
 *.csv
 *.rar
 finalized_model.sav
+finalized_model_rf.sav
