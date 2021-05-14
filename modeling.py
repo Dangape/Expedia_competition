@@ -39,24 +39,39 @@ print("Started running model...")
 #Create Random forest model
 print("Random Forest...")
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
-classifier_rf = MultiOutputClassifier(forest, n_jobs=-1)
+classifier_rf = MultiOutputClassifier(forest)
 classifier_rf.fit(X_train, Y_train)
 score = classifier_rf.score(X_test,Y_test)
 print(score)
+
+print("Saving model to disk...")
+filename = 'finalized_model_rf.sav'
+pickle.dump(classifier_rf, open(filename, 'wb'))
+print("Model saved!")
 #create new a knn model
 print("Knn...")
 knn = KNeighborsClassifier(n_neighbors=10)
-classifier_knn = MultiOutputClassifier(knn, n_jobs=-1)
+classifier_knn = MultiOutputClassifier(knn)
 classifier_knn.fit(X_train, Y_train)
 score = classifier_knn.score(X_test,Y_test)
 print(score)
+
+print("Saving model to disk...")
+filename = 'finalized_model_knn.sav'
+pickle.dump(classifier_knn, open(filename, 'wb'))
+print("Model saved!")
 #create a new logistic regression model
 print("Logistic regression...")
 log_reg = LogisticRegression()
-classifier_log_reg = MultiOutputClassifier(log_reg, n_jobs=-1)
+classifier_log_reg = MultiOutputClassifier(log_reg)
 classifier_log_reg.fit(X_train, Y_train)
 score = classifier_log_reg.score(X_test,Y_test)
 print(score)
+
+print("Saving model to disk...")
+filename = 'finalized_model_lg.sav'
+pickle.dump(classifier_log_reg, open(filename, 'wb'))
+print("Model saved!")
 
 # classifier = MultiOutputClassifier(forest, n_jobs=-1)
 # classifier.fit(X_train, Y_train)
@@ -68,7 +83,7 @@ print(score)
 print("Ensembling...")
 estimators=[("knn", classifier_knn), ("rf", classifier_rf),("log_reg",classifier_log_reg)]#create our voting classifier, inputting our models
 ensemble = VotingClassifier(estimators, voting="hard")
-classfier_ensembled = MultiOutputClassifier(ensemble, n_jobs=-1)
+classfier_ensembled = MultiOutputClassifier(ensemble)
 classfier_ensembled.fit(X_train, Y_train)#test our model on the test data
 print(classfier_ensembled.score(X_test, Y_test))
 
