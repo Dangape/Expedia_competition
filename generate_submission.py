@@ -3,73 +3,72 @@ import pickle
 import numpy as np
 from tqdm import tqdm
 
-# #Loading test data
-# print("Reading data...")
-# data = pd.read_csv("feature_engineering_test.csv")
-# print(data.head(5))
-# print(data.columns)
-# print(len(data.columns))
-#
-# data = data.drop(columns=["date_time","random_bool"])
-# data.replace([np.inf, -np.inf], int(0), inplace=True)
-#
-# # load the model from disk
-# print("Loading model...")
-# filename = 'finalized_model.sav'
-# loaded_model = pickle.load(open(filename, 'rb'))
-#
-# #Prediction
-# print("Loaded! Now, predicting...")
-# pred = loaded_model.predict(data)
-# print(pred)
-#
-# #Save prediction
-# print("Saving prediction...")
-# open_file = open("pred.pkl","wb")
-# pickle.dump(pred,open_file)
-# open_file.close()
+#Loading test data
+print("Reading data...")
+data = pd.read_csv("feature_engineering_test.csv")
+print(data.head(5))
+print(data.columns)
+print(len(data.columns))
 
-# #Load prediction
-# print("Loading file...")
-# open_file = open("pred.pkl","rb")
-# loaded_pred = pickle.load(open_file)
-# open_file.close()
-#
-# #Create submission file
-# print(type(loaded_pred))
-# d1 = {"predictions":loaded_pred.tolist()}
-# df = pd.DataFrame(d1)
-# df[["click_bool","booking_bool"]] = pd.DataFrame(df.predictions.tolist(), index = df.index)
-# df = df.drop(columns=["predictions"])
-#
-# submission = pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"click_bool":df["click_bool"],"booking_bool":df["booking_bool"]})
-# print(submission)
-#
-# def relevance_grade(row):
-#
-#     if ((row["click_bool"] == 0) & (row["booking_bool"] == 0)):
-#         return 0
-#     if ((row["click_bool"] == 1) & (row["booking_bool"] == 0)):
-#         return 1
-#     if ((row["click_bool"] == 0) & (row["booking_bool"] == 1)):
-#         return 5
-#     if ((row["click_bool"] == 1) & (row["booking_bool"] == 1)):
-#         return 6
-#     return "other"
-#
-# print("Generating relevance grade")
-# submission["relevance_grade"] = submission.apply(lambda row: relevance_grade(row), axis=1)
-# print(submission.head(10))
-# # print(submission.click_bool.unique())
-# # print(submission.booking_bool.unique())
-# submission.to_csv("submission.csv",index=False)
+data = data.drop(columns=["date_time"])
+data.replace([np.inf, -np.inf], int(0), inplace=True)
+
+# load the model from disk
+print("Loading model...")
+filename = 'finalized_model_XBC.sav'
+loaded_model = pickle.load(open(filename, 'rb'))
+
+#Prediction
+print("Loaded! Now, predicting...")
+pred = loaded_model.predict(data)
+print(pred)
+
+#Save prediction
+print("Saving prediction...")
+open_file = open("pred.pkl","wb")
+pickle.dump(pred,open_file)
+open_file.close()
+
+#Load prediction
+print("Loading file...")
+open_file = open("pred.pkl","rb")
+loaded_pred = pickle.load(open_file)
+open_file.close()
+
+#Create submission file
+print(type(loaded_pred))
+d1 = {"predictions":loaded_pred.tolist()}
+df = pd.DataFrame(d1)
+df[["prob_clicked","prob_booked"]] = pd.DataFrame(df.predictions.tolist(), index = df.index)
+df = df.drop(columns=["predictions"])
+
+submission = pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"prob_clicked":df["prob_clicked"],"prob_booked":df["prob_booked"]})
+print(submission)
+
+def relevance_grade(row):
+    value = row["prob_clicked"]*1 + row["prob_booked"]*5 + (row["prob_booked"]*row["prob_clicked"])*6
+    # if ((row["click_bool"] == 0) & (row["booking_bool"] == 0)):
+    #     return 0
+    # if ((row["click_bool"] == 1) & (row["booking_bool"] == 0)):
+    #     return 1
+    # if ((row["click_bool"] == 0) & (row["booking_bool"] == 1)):
+    #     return 5
+    # if ((row["click_bool"] == 1) & (row["booking_bool"] == 1)):
+    #     return 6
+    return value
+
+print("Generating relevance grade...")
+submission["expected_relevance_grade"] = submission.apply(lambda row: relevance_grade(row), axis=1)
+print(submission.head(10))
+# print(submission.click_bool.unique())
+# print(submission.booking_bool.unique())
+submission.to_csv("submission.csv",index=False)
 
 #Load submission
 submission = pd.read_csv("submission.csv")
 print(submission)
-print(submission.relevance_grade.unique())
 
-submission = submission.sort_values(by=['srch_id','relevance_grade'], ascending=[True,False])
+submission = submission.sort_values(by=['srch_id','expected_relevance_grade'], ascending=[True,False])
 print(submission)
 submission_final = submission.loc[:,['srch_id','prop_id']]
 print(submission_final)
