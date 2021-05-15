@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.pyplot import figure
 import pandas as pd
 import numpy as np
 import xgboost
@@ -6,14 +7,13 @@ from numpy import mean
 from numpy import absolute
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import RepeatedKFold
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
+from sklearn.metrics import r2_score
 from xgboost import XGBRegressor
 import pickle
 import time
+import seaborn as sns
 from collections import OrderedDict
 
 start_time = time.time()
@@ -51,30 +51,44 @@ print("Started running model...")
 
 #create new a XBC model
 print("XBC...")
+eval_set = [(X_test,Y_test)]
 XBC = XGBRegressor(booster = 'gbtree',learning_rate =0.01,
- n_estimators=5000,early_stopping_rounds=50,evals=[X_test,Y_test],max_depth=5,gamma=0.1,eval_metric="rmse")
+ n_estimators=5000,max_depth=6,gamma=0.1,eval_metric="rmse",
+                   early_stopping_rounds = 50,eval_set=eval_set,verbose=True)
 classifier_XBC = MultiOutputRegressor(XBC)
 classifier_XBC.fit(X_train, Y_train)
-
-cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-# evaluate model
-scores = cross_val_score(classifier_XBC, X_train, Y_train, scoring='neg_root_mean_squared_error', cv=cv)
-# force scores to be positive
-scores = absolute(scores)
-print(scores)
-print('Mean RMSE: %.3f (%.3f)' % (scores.mean(), scores.std()) )
 
 print("Saving model to disk...")
 filename = 'finalized_model_XBC.sav'
 pickle.dump(classifier_XBC, open(filename, 'wb'))
 print("Model saved!")
 
+# print("Loading model...")
+# filename = 'finalized_model_XBC.sav'
+# classifier_XBC = pickle.load(open(filename, 'rb'))
 
-print("%s seconds" %(time.time() - start_time))
+# evaluate model
+y_train_pred1 = classifier_XBC.predict(X_train)
+y_pred1 = classifier_XBC.predict(X_test)
 
-xgboost.plot_importance(classifier_XBC)
-plt.savefig("importance")
+
+train_mse1 = mean_squared_error(y_train_pred1, Y_train)
+test_mse1 = mean_squared_error(y_pred1, Y_test)
+train_rmse1 = np.sqrt(train_mse1)
+test_rmse1 = np.sqrt(test_mse1)
+print('Train RMSE: %.4f' % train_rmse1)
+print('Test RMSE: %.4f' % test_rmse1)
+
+print("Importance")
+feature_importances = pd.DataFrame(classifier_XBC.estimators_[0].feature_importances_,index = X_train.columns,columns=['importance']).sort_values('importance')
+print(feature_importances)
+figure(num=None, figsize=(20,18), dpi=80, facecolor='w', edgecolor='r')
+sns.barplot(x= feature_importances.importance,y =feature_importances.index)
+plt.title("Feature importance")
+plt.savefig("importance.png")
 plt.show()
 
-imp = OrderedDict(sorted(classifier_XBC.get_booster().get_fscore().items(), key=lambda t: t[1], reverse=True))
-print("Importance:",imp)
+# imp = OrderedDict(sorted(classifier_XBC.get_booster().get_fscore().items(), key=lambda t: t[1], reverse=True))
+# print("Importance:",imp)
+
+print("%s minutes" %((time.time() - start_time)/60))

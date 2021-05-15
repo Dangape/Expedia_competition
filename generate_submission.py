@@ -66,13 +66,10 @@ submission.to_csv("submission.csv",index=False)
 
 #Load submission
 submission = pd.read_csv("submission.csv")
-print(submission)
 
 submission = submission.sort_values(by=['srch_id','expected_relevance_grade'], ascending=[True,False])
 print(submission)
 submission_final = submission.loc[:,['srch_id','prop_id']]
-print(submission_final)
-
 submission_final.to_csv("send.csv", index=False)
 
 
