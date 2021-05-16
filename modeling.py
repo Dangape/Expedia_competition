@@ -39,24 +39,24 @@ X_train, X_val_and_test, Y_train, Y_val_and_test = train_test_split(X, y, test_s
 X_val, X_test, Y_val, Y_test = train_test_split(X_val_and_test, Y_val_and_test, test_size=0.5)
 
 #Create Ridge Regressor model
-# print("Ridge model...")
-# regressor = Ridge(alpha=100)
-# classifier_ridge = MultiOutputRegressor(regressor)
-# classifier_ridge.fit(X_train, Y_train)
-#
-# y_train_pred1 = classifier_ridge.predict(X_train)
-# y_pred1 = classifier_ridge.predict(X_test)
-# train_mse1 = mean_squared_error(y_train_pred1, Y_train)
-# test_mse1 = mean_squared_error(y_pred1, Y_test)
-# train_rmse1 = np.sqrt(train_mse1)
-# test_rmse1 = np.sqrt(test_mse1)
-# print('Train RMSE: %.4f' % train_rmse1)
-# print('Test RMSE: %.4f' % test_rmse1)
-#
-# print("Saving model to disk...")
-# filename = 'finalized_model_ridge.sav'
-# pickle.dump(classifier_ridge, open(filename, 'wb'))
-# print("Model saved!")
+print("Ridge model...")
+regressor = Ridge(alpha=100)
+classifier_ridge = MultiOutputRegressor(regressor)
+classifier_ridge.fit(X_train, Y_train)
+
+y_train_pred1 = classifier_ridge.predict(X_train)
+y_pred1 = classifier_ridge.predict(X_test)
+train_mse1 = mean_squared_error(y_train_pred1, Y_train)
+test_mse1 = mean_squared_error(y_pred1, Y_test)
+train_rmse1 = np.sqrt(train_mse1)
+test_rmse1 = np.sqrt(test_mse1)
+print('Train RMSE: %.4f' % train_rmse1)
+print('Test RMSE: %.4f' % test_rmse1)
+
+print("Saving model to disk...")
+filename = 'finalized_model_ridge.sav'
+pickle.dump(classifier_ridge, open(filename, 'wb'))
+print("Model saved!")
 
 #Create Neural Network model
 
@@ -108,21 +108,18 @@ print("Saved model to disk")
 
 #create new a XBC model
 print("XBC...")
-# eval_set = [(X_test,Y_test)]
-# XBC = XGBRegressor(booster = 'gbtree',learning_rate =0.01,
-#  n_estimators=5000,max_depth=4,gamma=0.2,eval_metric="rmse",
-#                    early_stopping_rounds = 50,eval_set=eval_set,verbose=True)
-# classifier_XBC = MultiOutputRegressor(XBC)
-# classifier_XBC.fit(X_train, Y_train)
-#
-# print("Saving model to disk...")
-# filename = 'finalized_model_XBC.sav'
-# pickle.dump(classifier_XBC, open(filename, 'wb'))
-# print("Model saved!")
-# load the model from disk
-print("Loading model...")
+eval_set = [(X_test,Y_test)]
+XBC = XGBRegressor(booster = 'gbtree',learning_rate =0.01,
+ n_estimators=5000,max_depth=4,gamma=0.2,eval_metric="rmse",
+                   early_stopping_rounds = 50,eval_set=eval_set,verbose=True)
+classifier_XBC = MultiOutputRegressor(XBC)
+classifier_XBC.fit(X_train, Y_train)
+
+print("Saving model to disk...")
 filename = 'finalized_model_XBC.sav'
-classifier_XBC = pickle.load(open(filename, 'rb'))
+pickle.dump(classifier_XBC, open(filename, 'wb'))
+print("Model saved!")
+
 # evaluate model
 y_train_pred1 = classifier_XBC.predict(X_train)
 y_pred1 = classifier_XBC.predict(X_test)
