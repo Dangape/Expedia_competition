@@ -2,9 +2,6 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
 import pandas as pd
 import numpy as np
-import xgboost
-from numpy import mean
-from numpy import absolute
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.multioutput import MultiOutputRegressor
@@ -15,7 +12,6 @@ from xgboost import XGBRegressor
 import pickle
 import time
 import seaborn as sns
-from collections import OrderedDict
 
 start_time = time.time()
 #Load data
@@ -58,7 +54,7 @@ print("Model saved!")
 
 #Create SGD Regressor model
 print("SGD Regressor...")
-regressor = SGDRegressor(eta0=0.01,epsilon=0.0001,loss='squared_epsilon_insensitive',learning_rate='adaptative')
+regressor = SGDRegressor(eta0=0.01,epsilon=0.0001,loss='squared_epsilon_insensitive',learning_rate='adaptive')
 classifier_SGD = MultiOutputRegressor(regressor)
 classifier_SGD.fit(X_train, Y_train)
 
@@ -98,18 +94,21 @@ print("Model saved!")
 
 #create new a XBC model
 print("XBC...")
-eval_set = [(X_test,Y_test)]
-XBC = XGBRegressor(booster = 'gbtree',learning_rate =0.01,
- n_estimators=5000,max_depth=4,gamma=0.2,eval_metric="rmse",
-                   early_stopping_rounds = 50,eval_set=eval_set,verbose=True)
-classifier_XBC = MultiOutputRegressor(XBC)
-classifier_XBC.fit(X_train, Y_train)
-
-print("Saving model to disk...")
+# eval_set = [(X_test,Y_test)]
+# XBC = XGBRegressor(booster = 'gbtree',learning_rate =0.01,
+#  n_estimators=5000,max_depth=4,gamma=0.2,eval_metric="rmse",
+#                    early_stopping_rounds = 50,eval_set=eval_set,verbose=True)
+# classifier_XBC = MultiOutputRegressor(XBC)
+# classifier_XBC.fit(X_train, Y_train)
+#
+# print("Saving model to disk...")
+# filename = 'finalized_model_XBC.sav'
+# pickle.dump(classifier_XBC, open(filename, 'wb'))
+# print("Model saved!")
+# load the model from disk
+print("Loading model...")
 filename = 'finalized_model_XBC.sav'
-pickle.dump(classifier_XBC, open(filename, 'wb'))
-print("Model saved!")
-
+classifier_XBC = pickle.load(open(filename, 'rb'))
 # evaluate model
 y_train_pred1 = classifier_XBC.predict(X_train)
 y_pred1 = classifier_XBC.predict(X_test)
