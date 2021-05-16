@@ -14,3 +14,5 @@ finalized_model_rf.sav
 *.hdf5
 *.json
 *.h5
+model.h5
+model.json
