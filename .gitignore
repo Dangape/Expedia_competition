@@ -12,3 +12,5 @@ finalized_model_rf.sav
 *.pkl
 *.pkl
 *.hdf5
+*.json
+*.h5

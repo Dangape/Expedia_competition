@@ -4,9 +4,8 @@ Test RMSE: 0,0421
 
 XGBoostRegressor
 Train RMSE: 0,0393
-Test RMSE: 0,0393
+Test RMSE: 0,0391
 
 Neural Network
-Train RMSE:
-Teste RMSE:
+Test RMSE:0,0569
 

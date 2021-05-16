@@ -98,7 +98,7 @@ plt.legend(['Train', 'Val'], loc='upper right')
 plt.savefig("loss_model.png")
 plt.show()
 
-serialize model to JSON
+# serialize model to JSON
 model_json = model.to_json()
 with open("model.json", "w") as json_file:
     json_file.write(model_json)
