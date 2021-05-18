@@ -9,3 +9,6 @@ Test RMSE: 0,0391
 Neural Network
 Test RMSE:0,0569
 
+XGBoost with binary data
+Score: 0.9552371252533605
+What is this score?
