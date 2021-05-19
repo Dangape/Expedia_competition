@@ -24,7 +24,6 @@ print("Loading model...")
 filename = 'finalized_model_XBC_bool.sav'
 loaded_model = pickle.load(open(filename, 'rb'))
 
-
 #Prediction
 print("Loaded! Now, predicting...")
 pred = loaded_model.predict_proba(data)
@@ -60,7 +59,7 @@ submission = pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"
 print(submission)
 
 def relevance_grade(row):
-    value = row["prob_clicked"]*1 + row["prob_booked"]*5
+    value = row["prob_clicked"]*1 + row["prob_booked"]
     return value
 
 
