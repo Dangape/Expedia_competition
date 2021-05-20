@@ -10,7 +10,6 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_auc_score, roc_curve
 from xgboost import XGBClassifier
 from sklearn.metrics import classification_report
-from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 import pickle
 import time
 import seaborn as sns
@@ -37,10 +36,10 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.1, random_
 #create new a XBC model
 print("XBC...")
 eval_set = [(X_test,Y_test)]
-eval_metric = ["auc"]
-model = XGBClassifier(booster = 'gbtree',learning_rate =0.001,
-                               n_estimators=5000,max_depth=8,gamma=0.2,
-                               use_label_encoder=False,objective="rank:ndcg",eval_metric=eval_metric)
+eval_metric = ["auc","error"]
+model = XGBClassifier(booster = 'gbtree',learning_rate =0.01,
+                               n_estimators=3000,max_depth=6,gamma=0.2,
+                               use_label_encoder=False,eval_metric=eval_metric,eval_set=eval_set)
 classifier_XBC = MultiOutputClassifier(model)
 classifier_XBC.fit(X_train, Y_train)
 
@@ -72,9 +71,9 @@ figure(num=None, figsize=(20,18), dpi=80, facecolor='w', edgecolor='r')
 sns.barplot(x= feature_importances.importance,y =feature_importances.index)
 plt.title("Feature importance XGBoost",fontsize=45)
 plt.xlabel("Importance",fontsize=35)
-plt.xticks(fontsize=16)
+plt.xticks(fontsize=10)
 plt.ylabel("Features",fontsize=35)
-plt.yticks(fontsize=15)
+plt.yticks(fontsize=10)
 plt.savefig("importance_XBC_click.png")
 plt.show()
 

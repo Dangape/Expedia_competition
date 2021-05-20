@@ -67,8 +67,8 @@ eval_set = [(X_test2,Y_test)]
 eval_metric = ["error"]
 classifier_XBC = XGBClassifier(booster = 'gbtree',learning_rate =0.001,
                                n_estimators=5000,max_depth=4,gamma=0.2,
-                               use_label_encoder=False)
-classifier_XBC.fit(X_train2, Y_train,early_stopping_rounds=50,eval_metric=eval_metric,eval_set=eval_set)
+                               use_label_encoder=False,objective="rank:ndcg")
+classifier_XBC.fit(X_train2, Y_train,early_stopping_rounds=50)
 
 
 print("Saving model to disk...")
