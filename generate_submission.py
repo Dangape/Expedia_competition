@@ -1,6 +1,7 @@
 import pandas as pd
 import pickle
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 from tqdm import tqdm
 
 #Loading test data
@@ -12,6 +13,8 @@ print(len(data.columns))
 
 data = data.drop(columns=["date_time"])
 data.replace([np.inf, -np.inf], int(0), inplace=True)
+min_max_scaler = MinMaxScaler()
+data[['price_usd',"price_difference_user"]] = min_max_scaler.fit_transform(data[['price_usd',"price_difference_user"]])
 
 # load the model from disk
 print("Loading model...")
@@ -46,7 +49,7 @@ submission = pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"
 print(submission)
 
 def relevance_grade(row):
-    value = row["prob_clicked"]*1 + row["prob_booked"]*5 + (row["prob_booked"]*row["prob_clicked"])*6
+    value = row["prob_clicked"]*1 + row["prob_booked"]*5
     # if ((row["click_bool"] == 0) & (row["booking_bool"] == 0)):
     #     return 0
     # if ((row["click_bool"] == 1) & (row["booking_bool"] == 0)):
@@ -66,13 +69,10 @@ submission.to_csv("submission.csv",index=False)
 
 #Load submission
 submission = pd.read_csv("submission.csv")
-print(submission)
 
 submission = submission.sort_values(by=['srch_id','expected_relevance_grade'], ascending=[True,False])
 print(submission)
 submission_final = submission.loc[:,['srch_id','prop_id']]
-print(submission_final)
-
 submission_final.to_csv("send.csv", index=False)
 
 

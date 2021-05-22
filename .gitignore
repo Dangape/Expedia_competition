@@ -10,3 +10,9 @@ finalized_model_rf.sav
 *.pkl
 *.pkl
 *.pkl
+*.pkl
+*.hdf5
+*.json
+*.h5
+model.h5
+model.json
