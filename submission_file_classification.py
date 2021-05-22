@@ -54,18 +54,28 @@ df2 = pd.DataFrame(loaded_pred[1],columns=["prob_booked_0","prob_booked_1"])
 df3 = pd.DataFrame({"prob_clicked":df1["prob_clicked_1"],"prob_booked":df2["prob_booked_1"]})
 
 print(df3)
+new_data = pd.concat([data,df3],axis=1)
+print(new_data.head(5))
 
-submission = pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"prob_clicked":df3["prob_clicked"],"prob_booked":df3["prob_booked"]})
+#Load pred rank
+filename = 'finalized_model_XBR_rank.sav'
+loaded_model = pickle.load(open(filename, 'rb'))
+rank = loaded_model.predict(new_data)
+print(rank)
+
+# submission = pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"prob_clicked":df3["prob_clicked"],"prob_booked":df3["prob_booked"]})
+# print(submission)
+#
+submission =  pd.DataFrame({"srch_id":data["srch_id"],"prop_id":data["prop_id"],"expected_relevance_grade":rank})
 print(submission)
-
-def relevance_grade(row):
-    value = row["prob_clicked"]*1 + row["prob_booked"]
-    return value
+# def relevance_grade(row):
+#     value = row["prob_clicked"]*1 + row["prob_booked"]
+#     return value
 
 
 print("Generating relevance grade...")
-submission["expected_relevance_grade"] = submission.apply(lambda row: relevance_grade(row), axis=1)
-print(submission.head(10))
+# submission["expected_relevance_grade"] = submission.apply(lambda row: relevance_grade(row), axis=1)
+# print(submission.head(10))
 
 submission.to_csv("submission.csv",index=False)
 

@@ -8,6 +8,7 @@ import time
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure
+from sklearn.metrics import mean_squared_error
 
 start_time = time.time()
 #Load data
@@ -28,7 +29,7 @@ filename = 'finalized_model_XBC_bool.sav'
 loaded_model = pickle.load(open(filename, 'rb'))
 
 #Prediction
-print("Loaded! Now, predicting...")
+print("Loaded! Now, predicting probas...")
 pred = loaded_model.predict_proba(data)
 print(pred)
 
@@ -51,20 +52,25 @@ print(new_data.head(10))
 X,y = new_data.drop(["expected_relevance_grade"],axis=1), new_data.loc[:,["expected_relevance_grade"]]
 X_train, X_test, Y_train, Y_test = train_test_split(X, y, test_size=0.1, random_state=0)
 
-eval_set = [(X_test,Y_test)]
-eval_metric = ["ndcg"]
+#XHBoostRegressor Model
+print("Running XGBRegressor")
+# eval_set = [(X_test,Y_test)]
+# eval_metric = ["ndcg"]
 model = XGBRegressor(booster = 'gbtree',learning_rate =0.01,
-                               n_estimators=3000,max_depth=6,gamma=0.2,
+                               n_estimators=3000,max_depth=4,gamma=0.2,
                                use_label_encoder=False,objective="rank:ndcg")
-model.fit(X_train, Y_train,eval_metric=eval_metric,eval_set=eval_set)
+model.fit(X_train, Y_train)
+yhat = model.predict(X_test)
+rms = mean_squared_error(Y_test, yhat, squared=False)
 
+#
 print("Saving model to disk...")
 filename = 'finalized_model_XBR_rank.sav'
 pickle.dump(model, open(filename, 'wb'))
 print("Model saved!")
 
 print("Importance XBR...")
-feature_importances = pd.DataFrame(model.estimators_[0].feature_importances_,index = X_train.columns,columns=['importance']).sort_values('importance')
+feature_importances = pd.DataFrame(model.feature_importances_,index = X_train.columns,columns=['importance']).sort_values('importance')
 print(feature_importances)
 figure(num=None, figsize=(20,18), dpi=80, facecolor='w', edgecolor='r')
 sns.barplot(x= feature_importances.importance,y =feature_importances.index)
